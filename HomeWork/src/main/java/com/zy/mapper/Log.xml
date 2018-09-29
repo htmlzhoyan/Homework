@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 使用对应的Dao层的接口 -->
+<mapper namespace="com.zy.dao.ILogDao">
+
+	<resultMap type="Log" id="logMap">
+		<id property="id" column="id"/>
+		<!-- 其他字段的映射关系 -->
+		<result property="time" column="time" />
+		<result property="createtime" column="createtime" />
+		<result property="endtime" column="endtime" />
+		<result property="flag" column="flag" />
+		<result property="username" column="username" />
+				
+	</resultMap>
+
+	
+
+	
+	<insert id="insertLog" parameterType="Log">
+		insert into t_log(time,createtime,endtime,flag,username) values(#{time},#{createtime},#{endtime},#{flag},#{username})
+	</insert>
+	
+	<select id="selectLog" resultType="Log" parameterType="map">
+		select * from t_log where username= #{username} and createtime like #{createtime};
+	</select>
+	
+	<update id="updateLog" parameterType="Log">
+		update t_log set time=#{time},flag=#{flag},endtime=#{endtime} where id=#{id} and username= #{username}	
+	</update>
+
+	<select id="selectLogName" resultType="Log" parameterType="map">
+		select * from t_log where username = #{username} order by id desc limit #{index},#{size} 
+	</select>
+
+</mapper>
+
+
+
+

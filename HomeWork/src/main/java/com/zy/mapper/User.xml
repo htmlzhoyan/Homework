@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 使用对应的Dao层的接口 -->
+<mapper namespace="com.zy.dao.IUserDao">
+
+	<resultMap type="User" id="usersMap">
+		<id property="id" column="id"/>
+		<!-- 其他字段的映射关系 -->
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="phone" column="phone" />
+		<result property="createdate" column="createdate" />
+	
+				
+	</resultMap>
+
+	
+	<select id="findUsrByName" parameterType="string" resultMap="usersMap">
+		select * from t_user where username = #{username}
+	</select>
+	
+	<insert id="insertName" parameterType="User">
+		insert into t_user(username,password,createdate,phone) values(#{username},#{password},#{createdate},#{phone})
+	</insert>
+	
+	<update id="updatetName" parameterType="User">
+		update t_user set phone=#{phone},password=#{password} where username= #{username}	
+	</update>
+	
+	
+	<select id="findUsrByNameAnd" parameterType="User" resultType="string">
+		select password from t_user where username = #{username} and phone = #{phone}
+	</select>
+
+
+
+</mapper>
+
+
+
+

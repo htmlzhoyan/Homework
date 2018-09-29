@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="media/layui/css/layui.css" media="all">
+<link rel="stylesheet" href="media/css/font-awesome.min.css" media="all">
+<script type="text/javascript" src="media/js/jquery.min.js"></script>
+
+<style>
+.info-box {
+	height: 85px;
+	background-color: white;
+	background-color: #ecf0f5;
+}
+
+.info-box .info-box-icon {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 2px;
+	display: block;
+	float: left;
+	height: 85px;
+	width: 85px;
+	text-align: center;
+	font-size: 45px;
+	line-height: 85px;
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.info-box .info-box-content {
+	padding: 5px 10px;
+	margin-left: 85px;
+}
+
+.info-box .info-box-content .info-box-text {
+	display: block;
+	font-size: 14px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+}
+
+.info-box .info-box-content .info-box-number {
+	display: block;
+	font-weight: bold;
+	font-size: 18px;
+}
+.major {
+	font-weight: 10px;
+	color: #01AAED;
+}
+.main {
+	margin-top: 25px;
+}
+
+.main .layui-row {
+	margin: 10px 0;
+}
+</style>
+</head>
+
+<body>
+	<div class="layui-fluid main">
+		<div class="layui-row layui-col-space15">
+			<div class="layui-col-md3">
+				<div class="info-box" style="cursor: pointer;" onclick="qiandao()">
+					<span class="info-box-icon"
+						style="background-color: #00c0ef !important; color: white;">
+						<i class="fa fa-child" ></i></span>
+					<div class="info-box-content">我要签到<span
+							class="info-box-number" id="s1"></span>
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-col-md3">
+				<div class="info-box" style="cursor: pointer;" onclick="xinxi()">
+					<span class="info-box-icon"
+						style="background-color: #00a65a !important; color: white;"><i
+						class="fa fa-users" aria-hidden="true"></i></span>
+					<span class="info-box-text">用户信息</span> 
+				</div>
+				<div class="info-box-content">
+						
+						<div class="info-box-number" id="s2"></div>
+					</div>
+			</div>
+			
+			
+		</div>
+		<div>
+			<table class="layui-table" id="tbdata"></table>
+
+		</div>
+		
+	</div>
+	<script src="media/layui/layui.js"></script>
+	<script>
+	function formatDateTime(timeStamp) { 
+	    var date = new Date(timeStamp);
+	    var y = date.getFullYear();    
+	    var m = date.getMonth() + 1;    
+	    m = m < 10 ? ('0' + m) : m;    
+	    var d = date.getDate();    
+	    d = d < 10 ? ('0' + d) : d;    
+	    var h = date.getHours();  
+	    h = h < 10 ? ('0' + h) : h;  
+	    var minute = date.getMinutes();  
+	    var second = date.getSeconds();  
+	    minute = minute < 10 ? ('0' + minute) : minute;    
+	    second = second < 10 ? ('0' + second) : second;   
+	    return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;    
+		};
+		var table;
+		var stn = true;
+	layui.use('table', function() {
+		table = layui.table;
+		 
+		
+		  
+		  //第一个实例
+		  table.render({
+		    elem: '#tbdata'
+		    ,height: 315
+		    ,url: 'selectLogName' //数据接口
+		    ,page: true //开启分页
+		    ,cols: [[ //表头
+		    	{field: 'createtime', title: '上午打卡时间',templet: function(d){
+			          return formatDateTime(d.createtime)
+			 
+					}}
+		      ,{field: 'endtime', title: '下午打卡时间',templet: function(d){
+		          return formatDateTime(d.endtime)
+		      }
+				}
+		      ,{field: 'flag', title: '是否异常',templet: function(d){
+		          if(d.flag==0){
+		        	  return "打卡异常"
+		          }else{
+		        	  return "打卡正常"
+		          }
+		      }
+				}
+		      ]]
+		  });
+		  
+	});
+	$(function(){
+		
+	})
+	function qiandao(){
+		 $.ajax({
+				type:"get",
+				url:"insertLog",
+				dataType:"json",
+				success:function(data){
+					if(data.code==1){
+		
+						$("#s1").html(data.msg)
+						table.render()
+					}
+					
+				}
+			});
+	}
+	
+	function xinxi(){
+		if(stn){
+			$("#s2").show()
+			$.ajax({
+				type:"get",
+				url:"selectUser",
+				dataType:"json",
+				success:function(data){
+
+					if(data.code==1){
+						var html = '';
+						html += '<div><span>用户名:</span><input type="text" readonly name="username"  value="'+data.msg.username+'"></div>'
+						html += '<div><span>密码:</span><input type="text" name="password" value="'+data.msg.password+'"></div>'
+						html += '<div><span>手机号 :</span><input type="text" name="phone" value="'+data.msg.phone+'"></div>'
+						html += '<button onclick="xiugai()">修改</button>'
+						$("#s2").html(html)
+						stn = false
+					}
+					
+				}
+			});
+		}else{
+			$("#s2").hide()
+			stn = true
+		}
+		 
+	}
+	
+	function xiugai(){
+		 $.ajax({
+				type:"post",
+				url:"updatetName",
+				data: {
+                	"username":$("input[name='username']").val(),
+                	"password":$("input[name='password']").val(),
+                	"phone":$("input[name='phone']").val(),
+                },
+				success:function(data){
+					if(data.code==1){
+		
+						alert("修改成功")
+						
+					}
+					
+				}
+			});
+	}
+	
+	function formatDateTime(timeStamp) { 
+	    var date = new Date(timeStamp);
+	    var y = date.getFullYear();    
+	    var m = date.getMonth() + 1;    
+	    m = m < 10 ? ('0' + m) : m;    
+	    var d = date.getDate();    
+	    d = d < 10 ? ('0' + d) : d;    
+	    var h = date.getHours();  
+	    h = h < 10 ? ('0' + h) : h;  
+	    var minute = date.getMinutes();  
+	    var second = date.getSeconds();  
+	    minute = minute < 10 ? ('0' + minute) : minute;    
+	    second = second < 10 ? ('0' + second) : second;   
+	    return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;    
+		};
+		
+		
+	</script>
+	
+	
+</body>
+
+</html>
